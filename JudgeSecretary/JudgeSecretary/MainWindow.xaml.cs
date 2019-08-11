@@ -1,17 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using System.Windows.Forms;
 
 namespace JudgeSecretary
 {
@@ -23,6 +12,21 @@ namespace JudgeSecretary
 		public MainWindow()
 		{
 			InitializeComponent();
+		}
+
+		private void Button_Click(object sender, RoutedEventArgs e)
+		{
+			using (var fbd = new FolderBrowserDialog())
+			{
+				var result = fbd.ShowDialog();
+
+				if (result == System.Windows.Forms.DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
+				{
+					string[] files = Directory.GetFiles(fbd.SelectedPath);
+
+					System.Windows.Forms.MessageBox.Show("Files found: " + files.Length, "Message");
+				}
+			}
 		}
 	}
 }

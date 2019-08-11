@@ -7,6 +7,16 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        
-    </Grid>
+		<Label Content="Выберете папку с приказами"
+			   HorizontalAlignment="Left"
+			   Margin="20,10,0,0"
+			   VerticalAlignment="Top" />
+		<Button Content="Судебные приказы"
+				HorizontalAlignment="Left"
+				Margin="20,41,0,0"
+				VerticalAlignment="Top"
+				Width="161"
+				Click="Button_Click" />
+
+	</Grid>
 </Window>
