@@ -9,9 +9,8 @@ namespace JudgeSecretaryUnitTests
 		[TestCaseSource(nameof(_orderParserTestSource2))]
 		public void OrderParserTest2(string orderText)
 		{
-			var lines = orderText.Split('\n');
 			var sut = new OrderParser();
-			var actual = sut.Parse(lines);
+			var actual = sut.Parse(orderText);
 
 			Assert.AreEqual("18", actual.Day);
 			Assert.AreEqual("ноября", actual.Month);

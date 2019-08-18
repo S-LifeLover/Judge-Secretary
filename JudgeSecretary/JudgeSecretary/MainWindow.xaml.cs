@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Forms;
 using Xceed.Words.NET;
@@ -115,16 +117,17 @@ namespace JudgeSecretary
 
 							using (var docxDocument = DocX.Load(docxFilePath))
 							{
-								docxDocument.ReplaceText("{CaseNumber}", orderInfo.CaseNumber);
-								docxDocument.ReplaceText("{Day}", orderInfo.Day);
-								docxDocument.ReplaceText("{Month}", orderInfo.Month);
+								docxDocument.ReplaceText("{CaseNumber}", orderInfo.CaseNumber ?? String.Empty);
+								docxDocument.ReplaceText("{Day}", orderInfo.Day ?? String.Empty);
+								docxDocument.ReplaceText("{Month}", orderInfo.Month ?? String.Empty);
 								docxDocument.ReplaceText("{Year}",
-									orderInfo.Year.Substring(orderInfo.Year.Length - 2, 2));
+									orderInfo.Year?.Substring(orderInfo.Year.Length - 2, 2) ?? String.Empty);
 
-								docxDocument.ReplaceText("{FullName}", orderInfo.Persons[0].FullName);
-								docxDocument.ReplaceText("{BirthDate}", orderInfo.Persons[0].BirthDate);
-								docxDocument.ReplaceText("{BirthPlace}", orderInfo.Persons[0].BirthPlace);
-								docxDocument.ReplaceText("{ResidencePlace}", orderInfo.Persons[0].ResidencePlace);
+								docxDocument.ReplaceText("{FullName}", orderInfo.Persons[0].FullName ?? String.Empty);
+								docxDocument.ReplaceText("{FullNameNominative}", orderInfo.Persons[0].FullName ?? String.Empty);
+								docxDocument.ReplaceText("{BirthDate}", orderInfo.Persons[0].BirthDate ?? String.Empty);
+								docxDocument.ReplaceText("{BirthPlace}", orderInfo.Persons[0].BirthPlace ?? String.Empty);
+								docxDocument.ReplaceText("{ResidencePlace}", orderInfo.Persons[0].ResidencePlace ?? String.Empty);
 
 								docxDocument.Save();
 							}
