@@ -1,4 +1,6 @@
-﻿namespace JudgeSecretary
+﻿using System;
+
+namespace JudgeSecretary
 {
 	public class OrderInfo
 	{
@@ -7,6 +9,7 @@
 		public string Year { get; set; }
 		public string CaseNumber { get; set; }
 		public PersonInfo[] Persons { get; set; }
+		public string StateDuty { get; set; }
 
 		public class PersonInfo
 		{

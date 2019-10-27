@@ -9,13 +9,6 @@
 		Height="450"
 		Width="800">
 	<Grid>
-		<Button Content="Приказы ИФНС"
-				Name="TaxButton"
-				HorizontalAlignment="Left"
-				Margin="10,38,0,0"
-				VerticalAlignment="Top"
-				Width="161"
-				Click="TaxButton_Click" />
 		<TextBox HorizontalAlignment="Left"
 				 Name="FineReaderPathTextBox"
 				 Height="23"
@@ -24,14 +17,28 @@
 				 Text="C:\Program Files (x86)\ABBYY FineReader 14\FineCmd.exe"
 				 VerticalAlignment="Top"
 				 Width="423" />
-		<Button Content="Просто старая кнопка"
-				Name="OldLogicButton"
-				IsEnabled="False"
+		<Button Content="Приказы ИФНС"
+		        IsEnabled="False"
+		        Name="TaxButton"
+		        HorizontalAlignment="Left"
+		        Margin="10,38,0,0"
+		        VerticalAlignment="Top"
+		        Width="161"
+		        Click="TaxButton_Click" />
+		<Button Content="Файл с данными"
+				x:Name="DataFileButton"
 				HorizontalAlignment="Left"
 				Margin="10,63,0,0"
 				VerticalAlignment="Top"
 				Width="161"
-				Click="OldLogicButton_Click" />
-
+		        Click="DataFileButton_OnClick"/>
+		<Button Content="Просто старая кнопка"
+		        Name="OldLogicButton"
+		        IsEnabled="False"
+		        HorizontalAlignment="Left"
+		        Margin="10,88,0,0"
+		        VerticalAlignment="Top"
+		        Width="161"
+		        Click="OldLogicButton_Click" />
 	</Grid>
 </Window>

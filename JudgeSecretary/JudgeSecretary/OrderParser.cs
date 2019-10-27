@@ -20,17 +20,19 @@ namespace JudgeSecretary
 				var dateAndCaseNumberMatch = dateAndCaseNumberRegex.Match(trimmedLine);
 				if (dateAndCaseNumberMatch.Success)
 				{
+					/*
 					result.Day = dateAndCaseNumberMatch.Groups["Day"].Value.Replace("I", "1");
 					result.Month = dateAndCaseNumberMatch.Groups["Month"].Value;
 					result.Year = dateAndCaseNumberMatch.Groups["Year"].Value;
 					result.CaseNumber = dateAndCaseNumberMatch.Groups["CaseNumber"].Value;
+					*/
 				}
 
 				foreach (Match personInfoMatch in personInfoRegex.Matches(trimmedLine))
 				{
 					var person = new OrderInfo.PersonInfo();
 					person.FullName = personInfoMatch.Groups["FullName"].Value;
-					person.BirthDate = personInfoMatch.Groups["BirthDate"].Value;
+					//person.BirthDate = personInfoMatch.Groups["BirthDate"].Value;
 					person.BirthPlace = personInfoMatch.Groups["BirthPlace"].Value;
 					person.ResidencePlace = personInfoMatch.Groups["ResidencePlace"].Value;
 					person.WorkPlace = personInfoMatch.Groups["WorkPlace"].Value;
