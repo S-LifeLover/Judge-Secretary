@@ -3,15 +3,16 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Forms;
 using Xceed.Words.NET;
 using MessageBox = System.Windows.Forms.MessageBox;
 using Path = System.IO.Path;
-using Word = Microsoft.Office.Interop.Word;
 using Microsoft.Office.Interop.Excel;
 using Window = System.Windows.Window;
+using Word = Microsoft.Office.Interop.Word;
 
 namespace JudgeSecretary
 {
@@ -31,6 +32,14 @@ namespace JudgeSecretary
 			"Апрель", "Май", "Июнь",
 			"Август", "Сентябрь", "Июль",
 			"Октябрь", "Ноябрь", "Декабрь"
+		};
+
+		private static string[] _months2 = new[]
+		{
+			"Января", "Февраля", "Марта",
+			"Апреля", "Мая", "Июня",
+			"Августа", "Сентября", "Июля",
+			"Октября", "Ноября", "Декабря"
 		};
 
 		private void OldLogicButton_Click(object sender, RoutedEventArgs e)
@@ -110,46 +119,149 @@ namespace JudgeSecretary
 					{
 						var destinationFolder = fbd.SelectedPath;
 
-						foreach (var file in files)
+						foreach (var file in files.OrderByDescending(f => f))
 						{
-							var docxFilePath = Path.Combine(destinationFolder,
-								Path.ChangeExtension(Path.GetFileName(file), "docx"));
-
-							string content = string.Empty;
-
 							var application = new Word.Application();
 							Word._Document document = application.Documents.Open(file);
-							content = document.Content.Text;
+							var content = document.Content.Text;
 							document.Close();
 							application.Quit();
 
 							var parser = new OrderParser();
 							var orderInfo = parser.Parse(content);
 
+							if (orderInfo.CaseNumber == null)
+							{
+								continue;
+							}
+
+							var docxFilePath = Path.Combine(
+								destinationFolder,
+								Path.ChangeExtension(
+									MakeValidFileName(orderInfo.CaseNumber) + "_"
+																			+ orderInfo.Persons.First()
+																				.FullName.Replace(" ", "_"),
+									"docx"));
+
 							File.Copy("Template.docx", docxFilePath, true);
+
+							var day = int.Parse(orderInfo.Day);
+							var moth = Array.IndexOf(
+								           _months2.Select(i => i.ToLowerInvariant()).ToArray(),
+										   orderInfo.Month.ToLowerInvariant()) + 1;
+							var year = int.Parse(orderInfo.Year);
+
+							var nextDate = new DateTime(year, moth, day).AddDays(28);
 
 							using (var docxDocument = DocX.Load(docxFilePath))
 							{
-								/*
-								docxDocument.ReplaceText("{CaseNumber}", orderInfo.CaseNumber ?? String.Empty);
-								docxDocument.ReplaceText("{Day}", orderInfo.Day ?? String.Empty);
-								docxDocument.ReplaceText("{Month}", orderInfo.Month ?? String.Empty);
-								docxDocument.ReplaceText("{Year}",
-									orderInfo.Year?.Substring(orderInfo.Year.Length - 2, 2) ?? String.Empty);
+								docxDocument.ReplaceText("{CaseNumber}", orderInfo.CaseNumber ?? string.Empty);
+								docxDocument.ReplaceText("{StateDuty}", orderInfo.StateDuty ?? string.Empty);
+								docxDocument.ReplaceText("{Day}", orderInfo.Day);
+								docxDocument.ReplaceText("{Month}", orderInfo.Month);
+								docxDocument.ReplaceText(
+									"{Year}",
+									orderInfo.Year?.Substring(orderInfo.Year.Length - 2, 2));
+								docxDocument.ReplaceText("{FullYear}", orderInfo.Year);
 
-								docxDocument.ReplaceText("{FullName}", orderInfo.Persons[0].FullName ?? String.Empty);
-								docxDocument.ReplaceText("{FullNameNominative}", orderInfo.Persons[0].FullName ?? String.Empty);
-								docxDocument.ReplaceText("{BirthDate}", orderInfo.Persons[0].BirthDate ?? String.Empty);
-								docxDocument.ReplaceText("{BirthPlace}", orderInfo.Persons[0].BirthPlace ?? String.Empty);
-								docxDocument.ReplaceText("{ResidencePlace}", orderInfo.Persons[0].ResidencePlace ?? String.Empty);
+								docxDocument.ReplaceText("{NextDay}", nextDate.Day.ToString("D2"));
+								docxDocument.ReplaceText("{NextMonth}", _months[nextDate.Month - 1]);
+								docxDocument.ReplaceText("{NextFullYear}", nextDate.Year.ToString());
+
+								docxDocument.ReplaceText("{FullName}", orderInfo.Persons[0].FullName ?? string.Empty);
+								docxDocument.ReplaceText(
+									"{FullNameNominative}",
+									orderInfo.Persons[0].FullName ?? string.Empty);
+								docxDocument.ReplaceText("{BirthDate}", orderInfo.Persons[0].BirthDate ?? string.Empty);
+								docxDocument.ReplaceText(
+									"{BirthPlace}",
+									orderInfo.Persons[0].BirthPlace ?? string.Empty);
+								docxDocument.ReplaceText(
+									"{ResidencePlace}",
+									orderInfo.Persons[0].ResidencePlace ?? string.Empty);
 
 								docxDocument.Save();
-								*/
 							}
 						}
 
 						MessageBox.Show("Готово");
 					}
+				}
+			}
+		}
+
+		private void FromTextBox_Click(object sender, RoutedEventArgs e)
+		{
+			using (var fbd = new FolderBrowserDialog())
+			{
+				fbd.Description = "Выберете папку, куда сохранить исполнительный";
+				var result = fbd.ShowDialog();
+
+				if (result == System.Windows.Forms.DialogResult.OK &&
+					!string.IsNullOrWhiteSpace(fbd.SelectedPath))
+				{
+					var destinationFolder = fbd.SelectedPath;
+
+					var content = ContentTextBox.Text;
+
+					var parser = new OrderParser();
+					var orderInfo = parser.Parse(content);
+
+					if (orderInfo.CaseNumber == null)
+					{
+						MessageBox.Show("Не получилось");
+						return;
+					}
+
+					var docxFilePath = Path.Combine(
+						destinationFolder,
+						Path.ChangeExtension(
+							MakeValidFileName(orderInfo.CaseNumber) + "_"
+																	+ orderInfo.Persons.First()
+																		.FullName.Replace(" ", "_"),
+							"docx"));
+
+					File.Copy("Template.docx", docxFilePath, true);
+
+					var day = int.Parse(orderInfo.Day);
+					var moth = Array.IndexOf(
+								   _months2.Select(i => i.ToLowerInvariant()).ToArray(),
+								   orderInfo.Month.ToLowerInvariant()) + 1;
+					var year = int.Parse(orderInfo.Year);
+
+					var nextDate = new DateTime(year, moth, day).AddDays(28);
+
+					using (var docxDocument = DocX.Load(docxFilePath))
+					{
+						docxDocument.ReplaceText("{CaseNumber}", orderInfo.CaseNumber ?? string.Empty);
+						docxDocument.ReplaceText("{StateDuty}", orderInfo.StateDuty ?? string.Empty);
+						docxDocument.ReplaceText("{Day}", orderInfo.Day);
+						docxDocument.ReplaceText("{Month}", orderInfo.Month);
+						docxDocument.ReplaceText(
+							"{Year}",
+							orderInfo.Year?.Substring(orderInfo.Year.Length - 2, 2));
+						docxDocument.ReplaceText("{FullYear}", orderInfo.Year);
+
+						docxDocument.ReplaceText("{NextDay}", nextDate.Day.ToString("D2"));
+						docxDocument.ReplaceText("{NextMonth}", _months[nextDate.Month - 1]);
+						docxDocument.ReplaceText("{NextFullYear}", nextDate.Year.ToString());
+
+						docxDocument.ReplaceText("{FullName}", orderInfo.Persons[0].FullName ?? string.Empty);
+						docxDocument.ReplaceText(
+							"{FullNameNominative}",
+							orderInfo.Persons[0].FullName ?? string.Empty);
+						docxDocument.ReplaceText("{BirthDate}", orderInfo.Persons[0].BirthDate ?? string.Empty);
+						docxDocument.ReplaceText(
+							"{BirthPlace}",
+							orderInfo.Persons[0].BirthPlace ?? string.Empty);
+						docxDocument.ReplaceText(
+							"{ResidencePlace}",
+							orderInfo.Persons[0].ResidencePlace ?? string.Empty);
+
+						docxDocument.Save();
+					}
+
+					MessageBox.Show("Готово");
 				}
 			}
 		}

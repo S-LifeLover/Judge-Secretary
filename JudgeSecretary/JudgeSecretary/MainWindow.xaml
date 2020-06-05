@@ -18,7 +18,7 @@
 				 VerticalAlignment="Top"
 				 Width="423" />
 		<Button Content="Приказы ИФНС"
-		        IsEnabled="False"
+		        IsEnabled="True"
 		        Name="TaxButton"
 		        HorizontalAlignment="Left"
 		        Margin="10,38,0,0"
@@ -32,13 +32,16 @@
 				VerticalAlignment="Top"
 				Width="161"
 		        Click="DataFileButton_OnClick"/>
-		<Button Content="Просто старая кнопка"
-		        Name="OldLogicButton"
-		        IsEnabled="False"
+		<Button Content="Сохранить исполнительный"
+		        Name="FromTextBoxButton"
+		        IsEnabled="True"
+				Visibility="Hidden"
 		        HorizontalAlignment="Left"
 		        Margin="10,88,0,0"
 		        VerticalAlignment="Top"
 		        Width="161"
-		        Click="OldLogicButton_Click" />
+		        Click="FromTextBox_Click" />
+		<TextBox Name="ContentTextBox" Visibility="Hidden" AcceptsReturn="True"  HorizontalAlignment="Left" Height="285" Margin="190,39,0,0" TextWrapping="Wrap" VerticalAlignment="Top"
+		         Width="528" />
 	</Grid>
 </Window>
