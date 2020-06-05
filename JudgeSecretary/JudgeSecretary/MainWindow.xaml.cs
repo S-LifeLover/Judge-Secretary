@@ -25,6 +25,14 @@ namespace JudgeSecretary
 			InitializeComponent();
 		}
 
+		private static string[] _months = new[]
+		{
+			"Январь", "Февраль", "Март",
+			"Апрель", "Май", "Июнь",
+			"Август", "Сентябрь", "Июль",
+			"Октябрь", "Ноябрь", "Декабрь"
+		};
+
 		private void OldLogicButton_Click(object sender, RoutedEventArgs e)
 		{
 			using (var fbd = new FolderBrowserDialog())
@@ -230,6 +238,12 @@ namespace JudgeSecretary
 
 								foreach (var orderInfo in orders)
 								{
+									var day = int.Parse(orderInfo.Day);
+									var moth = Array.IndexOf(_months.Select(i => i.ToLowerInvariant()).ToArray(), orderInfo.Month.ToLowerInvariant()) + 1;
+									var year = int.Parse(orderInfo.Year);
+
+									var nextDate = new DateTime(year, moth, day).AddDays(28);
+
 									var docxFilePath = Path.Combine(destinationFolder,
 										Path.ChangeExtension(MakeValidFileName(orderInfo.CaseNumber) + "_" + orderInfo.Persons.First().FullName.Replace(" ", "_"), "docx"));
 
@@ -243,6 +257,10 @@ namespace JudgeSecretary
 										docxDocument.ReplaceText("{Month}", orderInfo.Month);
 										docxDocument.ReplaceText("{Year}", orderInfo.Year?.Substring(orderInfo.Year.Length - 2, 2));
 										docxDocument.ReplaceText("{FullYear}", orderInfo.Year);
+
+										docxDocument.ReplaceText("{NextDay}", nextDate.Day.ToString("D2"));
+										docxDocument.ReplaceText("{NextMonth}", _months[nextDate.Month - 1]);
+										docxDocument.ReplaceText("{NextFullYear}", nextDate.Year.ToString());
 
 										docxDocument.ReplaceText("{FullName}", orderInfo.Persons[0].FullName ?? string.Empty);
 										docxDocument.ReplaceText("{FullNameNominative}", orderInfo.Persons[0].FullName ?? string.Empty);
